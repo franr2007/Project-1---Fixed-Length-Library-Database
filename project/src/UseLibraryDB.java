@@ -1,7 +1,6 @@
-package Services;
-import java.io.IOException;
 
 import DB.LibraryDB;
+import java.io.IOException;
 
 public class UseLibraryDB {
 
@@ -12,7 +11,7 @@ public class UseLibraryDB {
         try {
 
             // Open the database
-            pdb = new LibraryDB("parts.db");
+            pdb = new LibraryDB("library.db");
 
             // Populate the database if it is empty
             if (pdb.numRecs() == 0) {
