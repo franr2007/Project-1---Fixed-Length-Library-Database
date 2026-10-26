@@ -1,19 +1,18 @@
 package Services;
 import java.io.IOException;
 
-import DB.PartsDB;
-import DB.PartsDB.Part;
+import DB.LibraryDB;
 
-public class UsePartsDB {
+public class UseLibraryDB {
 
     public static void main(String[] args) {
 
-        PartsDB pdb = null;
+        LibraryDB pdb = null;
 
         try {
 
             // Open the database
-            pdb = new PartsDB("parts.db");
+            pdb = new LibraryDB("parts.db");
 
             // Populate the database if it is empty
             if (pdb.numRecs() == 0) {
@@ -83,16 +82,16 @@ public class UsePartsDB {
     }
 
     // Display all records
-    static void dumpRecords(PartsDB pdb) throws IOException {
+    static void dumpRecords(LibraryDB pdb) throws IOException {
 
         for (int i = 0; i < pdb.numRecs(); i++) {
 
-            PartsDB.Part part = pdb.select(i);
+            LibraryDB.Part part = pdb.select(i);
 
             System.out.print(
                     format(
                             part.getPartnum(),
-                            PartsDB.PNUMLEN,
+                            LibraryDB.PNUMLEN,
                             true
                     )
             );
@@ -102,7 +101,7 @@ public class UsePartsDB {
             System.out.print(
                     format(
                             part.getDesc(),
-                            PartsDB.DESCLEN,
+                            LibraryDB.DESCLEN,
                             true
                     )
             );

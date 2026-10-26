@@ -2,7 +2,7 @@ package DB;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-public class PartsDB {
+public class LibraryDB {
 
     // Fixed field lengths
     public static final int PNUMLEN = 20;
@@ -17,7 +17,7 @@ public class PartsDB {
     private RandomAccessFile raf;
 
     // Constructor
-    public PartsDB(String path) throws IOException {
+    public LibraryDB(String path) throws IOException {
         raf = new RandomAccessFile(path, "rw");
     }
 
@@ -182,7 +182,7 @@ public class PartsDB {
 
         try {
 
-            PartsDB db = new PartsDB("parts.dat");
+            LibraryDB db = new LibraryDB("parts.dat");
 
             // Add some records
             db.append("P001", "Keyboard", 10, 2500);
