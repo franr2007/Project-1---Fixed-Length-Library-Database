@@ -1,215 +1,151 @@
+
 package DB;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-public class LibraryDB {
+public class LibraryDB implements AutoCloseable {
 
-    // Fixed field lengths
-    public static final int PNUMLEN = 20;
-    public static final int DESCLEN = 30;
+    public static final int IDLEN = 12;
+    public static final int TITLELEN = 40;
     public static final int QUANLEN = 4;
     public static final int COSTLEN = 4;
 
-    // Size of one record
     private static final int RECLEN =
-            2 * PNUMLEN + 2 * DESCLEN + QUANLEN + COSTLEN;
+            2 * IDLEN + 2 * TITLELEN + QUANLEN + COSTLEN;
 
     private RandomAccessFile raf;
 
-    // Constructor
     public LibraryDB(String path) throws IOException {
         raf = new RandomAccessFile(path, "rw");
     }
 
-    // Add a record at the end of the file
-    public void append(String partnum, String partdesc,
-                       int qty, int ucost) throws IOException {
-
+    // Añadir un libro
+    public void append(String id, String title,
+                       int copies, int priceCents) throws IOException {
         raf.seek(raf.length());
-
-        write(partnum, partdesc, qty, ucost);
+        write(id, title, copies, priceCents);
     }
 
-    // Close the database
-    public void close() {
-        try {
-            raf.close();
-        } catch (IOException ioe) {
-            System.err.println(ioe);
-        }
+    // Cerrar el archivo
+    @Override
+    public void close() throws IOException {
+        raf.close();
     }
 
-    // Return the number of records
+    // Número de registros
     public int numRecs() throws IOException {
         return (int) (raf.length() / RECLEN);
     }
 
-    // Read a record
-    public Part select(int recno) throws IOException {
-
+    // Leer un libro
+    public Book select(int recno) throws IOException {
         if (recno < 0 || recno >= numRecs()) {
-            throw new IllegalArgumentException(
-                    recno + " out of range");
+            throw new IllegalArgumentException(recno + " out of range");
         }
 
-        raf.seek(recno * RECLEN);
-
+        raf.seek((long) recno * RECLEN);
         return read();
     }
 
-    // Update an existing record
-    public void update(int recno, String partnum,
-                       String partdesc, int qty,
-                       int ucost) throws IOException {
-
+    // Actualizar un libro
+    public void update(int recno, String id, String title,
+                       int copies, int priceCents) throws IOException {
         if (recno < 0 || recno >= numRecs()) {
-            throw new IllegalArgumentException(
-                    recno + " out of range");
+            throw new IllegalArgumentException(recno + " out of range");
         }
 
-        raf.seek(recno * RECLEN);
-
-        write(partnum, partdesc, qty, ucost);
+        raf.seek((long) recno * RECLEN);
+        write(id, title, copies, priceCents);
     }
 
-    // Read one record from the current file position
-    private Part read() throws IOException {
-
+    // Leer un registro
+    private Book read() throws IOException {
         StringBuilder sb = new StringBuilder();
 
-        // Read part number
-        for (int i = 0; i < PNUMLEN; i++) {
+        for (int i = 0; i < IDLEN; i++) {
             sb.append(raf.readChar());
         }
+        String id = sb.toString().trim();
 
-        String partnum = sb.toString().trim();
-
-        // Read description
         sb.setLength(0);
 
-        for (int i = 0; i < DESCLEN; i++) {
+        for (int i = 0; i < TITLELEN; i++) {
             sb.append(raf.readChar());
         }
+        String title = sb.toString().trim();
 
-        String partdesc = sb.toString().trim();
+        int copies = raf.readInt();
+        int priceCents = raf.readInt();
 
-        // Read quantity and unit cost
-        int qty = raf.readInt();
-        int ucost = raf.readInt();
-
-        return new Part(partnum, partdesc, qty, ucost);
+        return new Book(id, title, copies, priceCents);
     }
 
-    // Write one record
-    private void write(String partnum, String partdesc,
-                       int qty, int ucost) throws IOException {
+    // Escribir un registro
+    private void write(String id, String title,
+                       int copies, int priceCents) throws IOException {
 
-        // Prepare part number
-        StringBuilder sb = new StringBuilder(partnum);
+        StringBuilder sb = new StringBuilder(id);
 
-        if (sb.length() > PNUMLEN) {
-            sb.setLength(PNUMLEN);
-        } else {
-            while (sb.length() < PNUMLEN) {
-                sb.append(" ");
-            }
+        if (sb.length() > IDLEN) {
+            sb.setLength(IDLEN);
         }
-
+        while (sb.length() < IDLEN) {
+            sb.append(" ");
+        }
         raf.writeChars(sb.toString());
 
-        // Prepare description
-        sb = new StringBuilder(partdesc);
+        sb = new StringBuilder(title);
 
-        if (sb.length() > DESCLEN) {
-            sb.setLength(DESCLEN);
-        } else {
-            while (sb.length() < DESCLEN) {
-                sb.append(" ");
-            }
+        if (sb.length() > TITLELEN) {
+            sb.setLength(TITLELEN);
         }
-
+        while (sb.length() < TITLELEN) {
+            sb.append(" ");
+        }
         raf.writeChars(sb.toString());
 
-        // Write numeric fields
-        raf.writeInt(qty);
-        raf.writeInt(ucost);
+        raf.writeInt(copies);
+        raf.writeInt(priceCents);
     }
 
-    // Represents one part
-    public static class Part {
+    // Clase Book
+    public static class Book {
+        private String id;
+        private String title;
+        private int copies;
+        private int priceCents;
 
-        private String partnum;
-        private String desc;
-        private int qty;
-        private int ucost;
-
-        public Part(String partnum, String desc,
-                    int qty, int ucost) {
-
-            this.partnum = partnum;
-            this.desc = desc;
-            this.qty = qty;
-            this.ucost = ucost;
+        public Book(String id, String title,
+                    int copies, int priceCents) {
+            this.id = id;
+            this.title = title;
+            this.copies = copies;
+            this.priceCents = priceCents;
         }
 
-        public String getPartnum() {
-            return partnum;
+        public String getId() {
+            return id;
         }
 
-        public String getDesc() {
-            return desc;
+        public String getTitle() {
+            return title;
         }
 
-        public int getQty() {
-            return qty;
+        public int getCopies() {
+            return copies;
         }
 
-        public int getUnitCost() {
-            return ucost;
+        public int getPriceCents() {
+            return priceCents;
         }
 
         @Override
         public String toString() {
-            return "Part number: " + partnum
-                    + ", Description: " + desc
-                    + ", Quantity: " + qty
-                    + ", Unit cost: " + ucost;
-        }
-    }
-
-    // Main method so the program can be executed
-    public static void main(String[] args) {
-
-        try {
-
-            LibraryDB db = new LibraryDB("parts.dat");
-
-            // Add some records
-            db.append("P001", "Keyboard", 10, 2500);
-            db.append("P002", "Mouse", 20, 1500);
-            db.append("P003", "Monitor", 5, 12000);
-
-            System.out.println("Number of records: "
-                    + db.numRecs());
-
-            // Read records
-            System.out.println("\nReading records:");
-
-            for (int i = 0; i < db.numRecs(); i++) {
-                System.out.println(db.select(i));
-            }
-
-            // Update record 1
-            db.update(1, "P002", "Wireless Mouse", 25, 2000);
-
-            System.out.println("\nAfter updating record 1:");
-
-            System.out.println(db.select(1));
-
-            db.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            return "ID: " + id
+                    + ", Título: " + title
+                    + ", Ejemplares: " + copies
+                    + ", Precio: " + priceCents + " céntimos";
         }
     }
 }
