@@ -96,11 +96,11 @@ public class UseLibraryDB {
 
         for (int i = 0; i < pdb.numRecs(); i++) {
 
-            LibraryDB.Book part = pdb.select(i);
+            LibraryDB.Book libro = pdb.select(i);
 
             System.out.print(
                     format(
-                            part.getId(),
+                            libro.getId(),
                             LibraryDB.IDLEN,
                             true));
 
@@ -108,7 +108,7 @@ public class UseLibraryDB {
 
             System.out.print(
                     format(
-                            part.getTitle(),
+                            libro.getTitle(),
                             LibraryDB.TITLELEN,
                             true));
 
@@ -116,16 +116,16 @@ public class UseLibraryDB {
 
             System.out.print(
                     format(
-                            "" + part.getCopies(),
+                            "" + libro.getCopies(),
                             10,
                             false));
 
             System.out.print(" | ");
 
             // Unit cost is stored in cents
-            String s = part.getPriceCents() / 100
+            String s = libro.getPriceCents() / 100
                     + "."
-                    + part.getPriceCents() % 100;
+                    + libro.getPriceCents() % 100;
 
             // Add a leading zero if necessary
             if (s.charAt(s.length() - 2) == '.') {
