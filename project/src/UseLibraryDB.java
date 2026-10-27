@@ -4,181 +4,179 @@ import java.io.IOException;
 
 public class UseLibraryDB {
 
-    public static void main(String[] args) {
+        public static void main(String[] args) {
 
-        LibraryDB pdb = null;
+                LibraryDB pdb = null;
+                String registroBuscar;
 
-        try {
+                try {
 
-            // Open the database
-            pdb = new LibraryDB("library.db");
+                        // Open the database
+                        pdb = new LibraryDB("library.db");
 
-            // Populate the database if it is empty
-            if (pdb.numRecs() == 0) {
+                        // Populate the database if it is empty
+                        if (pdb.numRecs() == 0) {
 
-                pdb.append(
-                        "1-9009-3323-4x",
-                        "Wiper Blade Micro Edge",
-                        30,
-                        2468
-                );
+                                pdb.append(
+                                                "173482190375s",
+                                                "Rubius Japon 2009",
+                                                10,
+                                                3000);
 
-                pdb.append(
-                        "1-3233-44923-7j",
-                        "Parking Brake Cable",
-                        5,
-                        1995
-                );
+                                pdb.append(
+                                                "00004675239k",
+                                                "Cyberpunk edgerunners",
+                                                18,
+                                                2399);
 
-                pdb.append(
-                        "2-3399-6693-2m",
-                        "Halogen Bulb H4 55/60W",
-                        22,
-                        813
-                );
+                                pdb.append(
+                                                "99215739456r",
+                                                "El mentalista",
+                                                45,
+                                                500);
 
-                pdb.append(
-                        "2-599-2029-6k",
-                        "Turbo Oil Line O-Ring",
-                        26,
-                        155
-                );
+                                pdb.append(
+                                                "23723986095f",
+                                                "You",
+                                                2,
+                                                3500);
 
-                pdb.append(
-                        "3-1299-3299-9u",
-                        "Air Pump Electric",
-                        9,
-                        20200
-                );
-            }
+                                pdb.append(
+                                                "34758020345p",
+                                                "The walking dead",
+                                                29,
+                                                4050);
+                        }
 
-            // Display all records
-            dumpRecords(pdb);
+                        // Display all records
+                        System.out.println("=== Libros iniciales ===");
+                        dumpRecords(pdb);
 
-            // Update record 1
-            pdb.update(
-                    1,
-                    "1-3233-44923-7j",
-                    "Parking Brake Cable",
-                    10,
-                    1995
-            );
+                        // Update record 1
+                        pdb.update(
+                                        1,
+                                        "00004675239k",
+                                        "Cyberpunk edgerunners",
+                                        10,
+                                        1899);
 
-            // Display records again
-            dumpRecords(pdb);
+                        // Display records again
+                        System.out.println("=== Libros actualizados ===");
+                        dumpRecords(pdb);
 
-        } catch (IOException ioe) {
+                        // buscar un registro entre todos
+                        registroBuscar = pdb.select(2).getDesc();
+                        System.out.println("Book in the regist 2: " + registroBuscar);
 
-            System.err.println(ioe);
+                } catch (IOException ioe) {
 
-        } finally {
+                        System.err.println(ioe);
 
-            // Close the database
-            if (pdb != null) {
-                pdb.close();
-            }
-        }
-    }
+                } finally {
 
-    // Display all records
-    static void dumpRecords(LibraryDB pdb) throws IOException {
-
-        for (int i = 0; i < pdb.numRecs(); i++) {
-
-            LibraryDB.Part part = pdb.select(i);
-
-            System.out.print(
-                    format(
-                            part.getPartnum(),
-                            LibraryDB.PNUMLEN,
-                            true
-                    )
-            );
-
-            System.out.print(" | ");
-
-            System.out.print(
-                    format(
-                            part.getDesc(),
-                            LibraryDB.DESCLEN,
-                            true
-                    )
-            );
-
-            System.out.print(" | ");
-
-            System.out.print(
-                    format(
-                            "" + part.getQty(),
-                            10,
-                            false
-                    )
-            );
-
-            System.out.print(" | ");
-
-            // Unit cost is stored in cents
-            String s = part.getUnitCost() / 100
-                    + "."
-                    + part.getUnitCost() % 100;
-
-            // Add a leading zero if necessary
-            if (s.charAt(s.length() - 2) == '.') {
-                s += "0";
-            }
-
-            System.out.println(
-                    format(
-                            s,
-                            10,
-                            false
-                    )
-            );
+                        // Close the database
+                        if (pdb != null) {
+                                pdb.close();
+                        }
+                }
         }
 
-        System.out.println(
-                "Number of records = " + pdb.numRecs()
-        );
+        // Display all records
+        static void dumpRecords(LibraryDB pdb) throws IOException {
 
-        System.out.println();
-    }
+                System.out.println(
+                                format("ID", LibraryDB.PNUMLEN, true) + " | "
+                                                + format("Title", LibraryDB.DESCLEN, true) + " | "
+                                                + format("Quantity", 10, false) + " | "
+                                                + format("Price", 10, false));
 
-    // Format a string to a fixed width
-    static String format(
-            String value,
-            int maxWidth,
-            boolean leftAlign) {
+                for (int i = 0; i < pdb.numRecs(); i++) {
 
-        StringBuilder sb = new StringBuilder();
+                        LibraryDB.Part part = pdb.select(i);
 
-        int len = value.length();
+                        System.out.print(
+                                        format(
+                                                        part.getPartnum(),
+                                                        LibraryDB.PNUMLEN,
+                                                        true));
 
-        // Truncate if the value is too long
-        if (len > maxWidth) {
+                        System.out.print(" | ");
 
-            len = maxWidth;
-            value = value.substring(0, len);
+                        System.out.print(
+                                        format(
+                                                        part.getDesc(),
+                                                        LibraryDB.DESCLEN,
+                                                        true));
+
+                        System.out.print(" | ");
+
+                        System.out.print(
+                                        format(
+                                                        "" + part.getQty(),
+                                                        10,
+                                                        false));
+
+                        System.out.print(" | ");
+
+                        // Unit cost is stored in cents
+                        String s = part.getUnitCost() / 100
+                                        + "."
+                                        + part.getUnitCost() % 100;
+
+                        // Add a leading zero if necessary
+                        if (s.charAt(s.length() - 2) == '.') {
+                                s += "0";
+                        }
+
+                        System.out.println(
+                                        format(
+                                                        s,
+                                                        10,
+                                                        false));
+                }
+
+                System.out.println(
+                                "Number of records = " + pdb.numRecs());
+
+                System.out.println();
         }
 
-        // Left-align
-        if (leftAlign) {
+        // Format a string to a fixed width
+        static String format(
+                        String value,
+                        int maxWidth,
+                        boolean leftAlign) {
 
-            sb.append(value);
+                StringBuilder sb = new StringBuilder();
 
-            for (int i = 0; i < maxWidth - len; i++) {
-                sb.append(" ");
-            }
+                int len = value.length();
 
-        // Right-align
-        } else {
+                // Truncate if the value is too long
+                if (len > maxWidth) {
 
-            for (int i = 0; i < maxWidth - len; i++) {
-                sb.append(" ");
-            }
+                        len = maxWidth;
+                        value = value.substring(0, len);
+                }
 
-            sb.append(value);
+                // Left-align
+                if (leftAlign) {
+
+                        sb.append(value);
+
+                        for (int i = 0; i < maxWidth - len; i++) {
+                                sb.append(" ");
+                        }
+
+                        // Right-align
+                } else {
+
+                        for (int i = 0; i < maxWidth - len; i++) {
+                                sb.append(" ");
+                        }
+
+                        sb.append(value);
+                }
+
+                return sb.toString();
         }
-
-        return sb.toString();
-    }
 }
